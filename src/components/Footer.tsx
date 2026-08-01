@@ -27,8 +27,8 @@ export function Footer() {
               { href: '/#services', label: t.nav.services },
               { href: '/#ai', label: t.nav.ai },
               { href: '/#projects', label: t.nav.projects },
-              { href: '/#process', label: t.nav.process },
-              { href: '/#contact', label: t.nav.contact },
+              { href: '/about', label: lang === 'ar' ? 'عن الشركة' : 'About' },
+              { href: '/contact', label: lang === 'ar' ? 'التواصل والدعم' : 'Contact & Support' },
             ].map((l) => (
               <li key={l.href}>
                 <a href={l.href} className="hover:text-brand transition-colors">
