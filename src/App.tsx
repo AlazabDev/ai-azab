@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import LegalPage from './pages/LegalPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
+import HowWeWorkPage from './pages/HowWeWorkPage'
 import NotFound from './pages/NotFound'
 
 const LEGAL_SLUGS = [
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/how-we-work" element={<HowWeWorkPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
           {LEGAL_SLUGS.map((slug) => (
             <Route key={slug} path={`/${slug}`} element={<LegalPage />} />
