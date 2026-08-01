@@ -11,11 +11,8 @@ export function Footer() {
     <footer className="border-t border-border bg-card">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <div className="flex items-center gap-2.5">
-            <img src="/logo-mark.png" alt="Al Azab" className="h-7 w-auto" width={64} height={32} />
-            <span className="text-lg font-extrabold tracking-tight text-foreground">
-              ai-azab<span className="text-brand">.co</span>
-            </span>
+          <div className="flex items-center">
+            <img src="/logo-mark.png" alt="شركة العزب للخدمات الهندسية — ai-azab.co" className="h-8 w-auto" width={732} height={186} />
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">{t.footer.about}</p>
         </div>
