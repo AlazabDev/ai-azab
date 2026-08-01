@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useParams, Navigate } from 'react-router-dom'
+import { Link, useParams, useLocation, Navigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
@@ -7,7 +7,9 @@ import { useLang } from '@/i18n/LanguageProvider'
 import { legal } from '@/i18n/legal'
 
 export default function LegalPage() {
-  const { slug } = useParams<{ slug: string }>()
+  const params = useParams<{ slug: string }>()
+  const location = useLocation()
+  const slug = params.slug ?? location.pathname.replace(/^\/+|\/+$/g, '')
   const { lang, isRTL } = useLang()
   const docs = legal[lang]
   const doc = docs.find((d) => d.slug === slug)
@@ -18,11 +20,12 @@ export default function LegalPage() {
     const meta = document.querySelector('meta[name="description"]')
     if (meta) meta.setAttribute('content', doc.description)
     const canonical = document.querySelector('link[rel="canonical"]')
-    if (canonical) canonical.setAttribute('href', `https://ai-alazab.co/legal/${doc.slug}`)
+    if (canonical) canonical.setAttribute('href', `https://ai-alazab.co/${doc.slug}`)
     window.scrollTo(0, 0)
   }, [doc])
 
   if (!doc) return <Navigate to="/" replace />
+
 
   const Arrow = isRTL ? ArrowRight : ArrowLeft
 
