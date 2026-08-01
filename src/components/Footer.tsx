@@ -53,7 +53,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
             {docs.map((d) => (
               <li key={d.slug}>
-                <Link to={`/legal/${d.slug}`} className="hover:text-brand transition-colors">
+                <Link to={`/${d.slug}`} className="hover:text-brand transition-colors">
                   {d.title}
                 </Link>
               </li>

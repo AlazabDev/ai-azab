@@ -67,7 +67,7 @@ export default function LegalPage() {
               .filter((d) => d.slug !== doc.slug)
               .map((d) => (
                 <li key={d.slug}>
-                  <Link to={`/legal/${d.slug}`} className="hover:text-brand transition-colors">
+                  <Link to={`/${d.slug}`} className="hover:text-brand transition-colors">
                     {d.title}
                   </Link>
                 </li>
