@@ -1,15 +1,18 @@
 'use client'
 
 
+import { Link } from 'react-router-dom'
 import { useLang } from '@/i18n/LanguageProvider'
+import { legal } from '@/i18n/legal'
 
 export function Footer() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const year = new Date().getFullYear()
+  const docs = legal[lang]
 
   return (
     <footer className="border-t border-border bg-card">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center">
             <img src="/logo-mark.png" alt="شركة العزب للخدمات الهندسية — ai-azab.co" className="h-8 w-auto" width={732} height={186} />
