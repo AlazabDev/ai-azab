@@ -24,11 +24,11 @@ export function Footer() {
           <h4 className="text-sm font-bold text-foreground">{t.footer.quick}</h4>
           <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
             {[
-              { href: '#services', label: t.nav.services },
-              { href: '#ai', label: t.nav.ai },
-              { href: '#projects', label: t.nav.projects },
-              { href: '#process', label: t.nav.process },
-              { href: '#contact', label: t.nav.contact },
+              { href: '/#services', label: t.nav.services },
+              { href: '/#ai', label: t.nav.ai },
+              { href: '/#projects', label: t.nav.projects },
+              { href: '/#process', label: t.nav.process },
+              { href: '/#contact', label: t.nav.contact },
             ].map((l) => (
               <li key={l.href}>
                 <a href={l.href} className="hover:text-brand transition-colors">
