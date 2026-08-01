@@ -1,152 +1,116 @@
+'use client'
+
 import { useState } from 'react'
-import { useToast } from '@/hooks/use-toast'
+import { motion } from 'framer-motion'
+import { Mail, Globe, Clock, CheckCircle2, Loader2 } from 'lucide-react'
+import { supabase } from '@/integrations/supabase/client'
+import { useLang } from '@/i18n/LanguageProvider'
 
 export function Contact() {
-  const { toast } = useToast()
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { t, lang } = useLang()
+  const [sending, setSending] = useState(false)
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      toast({ title: 'Please fill in all fields', variant: 'destructive' })
-      return
-    }
-    setIsSubmitting(true)
-    // Simulate submission — connect to a backend to actually send
-    setTimeout(() => {
-      toast({ title: 'Message sent!', description: "We'll get back to you soon." })
-      setFormData({ name: '', email: '', message: '' })
-      setIsSubmitting(false)
-    }, 1000)
+    const form = new FormData(e.currentTarget)
+    setSending(true)
+    setError(null)
+    const { error } = await supabase.from('leads').insert({
+      name: String(form.get('name') || ''),
+      email: String(form.get('email') || ''),
+      phone: String(form.get('phone') || ''),
+      project_type: String(form.get('project_type') || ''),
+      message: String(form.get('message') || ''),
+      lang,
+    })
+    setSending(false)
+    if (error) setError(error.message)
+    else setDone(true)
   }
 
+  const field =
+    'w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand transition-colors'
+
   return (
-    <section id="contact" className="relative py-32 bg-card/30">
-      <div className="container mx-auto px-6 sm:px-8 lg:px-12">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-3 h-3 bg-accent-emerald rounded-full animate-pulse" />
-            <span className="text-sm font-semibold text-muted-foreground">
-              Let's Create Together
-            </span>
-            <div className="w-3 h-3 bg-accent-blue rounded-full animate-pulse" />
-          </div>
-          
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-8">
-            <span className="block mb-2">Ready to Light Up the Screen?</span>
+    <section id="contact" className="py-24 sm:py-32">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand">{t.contact.eyebrow}</span>
+          <h2 className="mt-4 text-3xl sm:text-5xl font-black tracking-tight text-foreground leading-tight">
+            {t.contact.title}
           </h2>
-          
-          <p className="text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Tell us about your project and we'll get back to you with a plan to bring your vision to cinematic reality
-          </p>
+          <p className="mt-5 text-base text-muted-foreground leading-relaxed">{t.contact.subtitle}</p>
+
+          <div className="mt-10 space-y-4">
+            <h3 className="text-sm font-bold text-foreground">{t.contact.infoTitle}</h3>
+            {[
+              { Icon: Mail, value: t.contact.email_v, href: `mailto:${t.contact.email_v}` },
+              { Icon: Globe, value: t.contact.site_v, href: 'https://ai-alazab.co' },
+              { Icon: Clock, value: t.contact.hours },
+            ].map(({ Icon, value, href }) => (
+              <div key={value} className="flex items-center gap-3 text-sm text-muted-foreground">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <Icon className="h-4 w-4" />
+                </span>
+                {href ? (
+                  <a href={href} className="hover:text-brand transition-colors">
+                    {value}
+                  </a>
+                ) : (
+                  <span>{value}</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Contact Form */}
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-background clean-border rounded-3xl overflow-hidden elevated-shadow">
-            <div className="bg-card/50 px-8 py-6 border-b border-border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-black text-foreground mb-1">
-                    Get In Touch
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Fill out the form and we'll respond within 24 hours
-                  </p>
-                </div>
-                <div className="hidden sm:flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-accent-emerald rounded-full" />
-                  <span className="text-sm text-muted-foreground font-medium">Available now</span>
-                </div>
-              </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl border border-border bg-card p-6 sm:p-8"
+        >
+          {done ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+              <CheckCircle2 className="h-12 w-12 text-brand" />
+              <p className="text-lg font-bold text-foreground">{t.contact.success}</p>
             </div>
-            
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-foreground mb-2">Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    maxLength={100}
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent-blue/50 transition-all"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-foreground mb-2">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    maxLength={255}
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent-blue/50 transition-all"
-                    placeholder="your@email.com"
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-foreground mb-2">Message</label>
-                <textarea
-                  id="message"
-                  rows={5}
-                  maxLength={1000}
-                  value={formData.message}
-                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent-blue/50 transition-all resize-none"
-                  placeholder="Tell us about your project..."
-                />
-              </div>
+          ) : (
+            <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
+              <input name="name" required placeholder={t.contact.name} className={field} />
+              <input name="email" type="email" required placeholder={t.contact.email} className={field} />
+              <input name="phone" placeholder={t.contact.phone} className={field} />
+              <select name="project_type" defaultValue="" className={field} required>
+                <option value="" disabled>
+                  {t.contact.project}
+                </option>
+                {t.contact.projectTypes.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <textarea
+                name="message"
+                rows={5}
+                placeholder={t.contact.message}
+                className={`${field} sm:col-span-2 resize-none`}
+              />
+              {error && <p className="sm:col-span-2 text-sm text-destructive">{error}</p>}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-4 rounded-xl bg-foreground text-background font-black text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                disabled={sending}
+                className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-brand-foreground hover:bg-brand-soft transition-colors disabled:opacity-60"
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                {sending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {t.contact.submit}
               </button>
             </form>
-          </div>
-        </div>
-
-        {/* Bottom Info */}
-        <div className="text-center mt-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-background clean-border rounded-2xl p-6 subtle-shadow">
-              <div className="w-12 h-12 bg-accent-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-accent-blue rounded-full" />
-              </div>
-              <h4 className="font-black text-foreground mb-2">Project Discussion</h4>
-              <p className="text-muted-foreground text-sm">
-                Share your vision and requirements with our team
-              </p>
-            </div>
-            
-            <div className="bg-background clean-border rounded-2xl p-6 subtle-shadow">
-              <div className="w-12 h-12 bg-accent-emerald/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-accent-emerald rounded-full" />
-              </div>
-              <h4 className="font-black text-foreground mb-2">Custom Strategy</h4>
-              <p className="text-muted-foreground text-sm">
-                Get a tailored approach for your unique project
-              </p>
-            </div>
-            
-            <div className="bg-background clean-border rounded-2xl p-6 subtle-shadow">
-              <div className="w-12 h-12 bg-accent-purple/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-accent-purple rounded-full" />
-              </div>
-              <h4 className="font-black text-foreground mb-2">Next Steps</h4>
-              <p className="text-muted-foreground text-sm">
-                Clear timeline and roadmap to bring your idea to life
-              </p>
-            </div>
-          </div>
-        </div>
+          )}
+        </motion.div>
       </div>
     </section>
   )

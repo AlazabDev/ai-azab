@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Menu, X, Globe } from 'lucide-react'
-import logoMark from '@/assets/logo-mark.png.asset.json'
+
 import { useLang } from '@/i18n/LanguageProvider'
 
 export function Navbar() {
@@ -38,11 +38,8 @@ export function Navbar() {
         }`}
       >
         <nav className="mx-auto max-w-7xl px-5 sm:px-8 py-3.5 flex items-center justify-between gap-4">
-          <a href="#hero" className="flex items-center gap-2.5 shrink-0">
-            <img src={logoMark.url} alt="Al Azab" className="h-7 w-auto" width={64} height={32} />
-            <span className="font-extrabold tracking-tight text-lg text-foreground">
-              ai-azab<span className="text-brand">.co</span>
-            </span>
+          <a href="#hero" className="flex items-center shrink-0" aria-label="ai-azab.co">
+            <img src="/logo-mark.png" alt="شركة العزب للخدمات الهندسية — ai-azab.co" className="h-8 w-auto" width={732} height={186} />
           </a>
 
           <div className="hidden lg:flex items-center gap-7">
