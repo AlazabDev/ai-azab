@@ -19,6 +19,7 @@ export default {
     extend: {
       fontFamily: {
         bagel: ['Bagel Fat One', 'cursive'],
+        display: ['Cairo', 'Manrope', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "var(--border)",
@@ -26,6 +27,12 @@ export default {
         ring: "var(--ring)",
         background: "var(--background)",
         foreground: "var(--foreground)",
+        brand: {
+          DEFAULT: "var(--brand)",
+          soft: "var(--brand-soft)",
+          foreground: "var(--brand-foreground)",
+        },
+
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
