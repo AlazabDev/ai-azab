@@ -26,7 +26,7 @@ export default function HowWeWorkPage() {
           : 'How Al Azab delivers architectural projects: from analysis to a single federated BIM model, with an AI automation layer for clash review, quantities and cost control.',
       )
     const canonical = document.querySelector('link[rel="canonical"]')
-    if (canonical) canonical.setAttribute('href', 'https://ai-alazab.co/how-we-work')
+    if (canonical) canonical.setAttribute('href', 'https://ai-azab.co/how-we-work')
     window.scrollTo(0, 0)
   }, [ar])
 
