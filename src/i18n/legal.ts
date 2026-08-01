@@ -458,4 +458,6 @@ export const legalAr: LegalDoc[] = [
   },
 ]
 
-export const legal = { en: legalEn, ar: legalAr }
+import { extraEn, extraAr } from './legalExtra'
+
+export const legal = { en: [...legalEn, ...extraEn], ar: [...legalAr, ...extraAr] }
