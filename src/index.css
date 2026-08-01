@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Manrope:wght@400;500;600;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,37 +7,56 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --card: #fafafa;
-  --card-foreground: #0a0a0a;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-  --primary: #0a0a0a;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #0a0a0a;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #0a0a0a;
+  /* Al Azab brand — graphite + signature orange */
+  --background: #0a0c0f;
+  --foreground: #f4f6f8;
+  --card: #12161b;
+  --card-foreground: #f4f6f8;
+  --popover: #12161b;
+  --popover-foreground: #f4f6f8;
+  --primary: #f79e02;
+  --primary-foreground: #0a0c0f;
+  --secondary: #171c22;
+  --secondary-foreground: #f4f6f8;
+  --muted: #171c22;
+  --muted-foreground: #9aa5b1;
+  --accent: #1c222a;
+  --accent-foreground: #f4f6f8;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #e4e4e7;
-  --input: #f4f4f5;
-  --input-background: #ffffff;
-  --switch-background: #e4e4e7;
+  --border: #232a33;
+  --input: #171c22;
+  --input-background: #12161b;
+  --switch-background: #232a33;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #a1a1aa;
-  
-  /* Simplified accent colors */
+  --ring: #f79e02;
+
+  --brand: #f79e02;
+  --brand-soft: #ffc25c;
+  --brand-foreground: #0a0c0f;
+
   --accent-blue: #2563eb;
   --accent-emerald: #059669;
   --accent-purple: #7c3aed;
-  
+
   --radius: 0.75rem;
 }
+
+html[lang="ar"] body { font-family: 'Cairo', system-ui, sans-serif; }
+html[lang="en"] body { font-family: 'Manrope', system-ui, sans-serif; }
+
+.brand-gradient-text {
+  background: linear-gradient(100deg, var(--brand-soft), var(--brand));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hairline {
+  border: 1px solid var(--border);
+}
+
 
 .dark {
   --background: #0a0a0a;
