@@ -27,6 +27,7 @@ export function Footer() {
               { href: '/#services', label: t.nav.services },
               { href: '/#ai', label: t.nav.ai },
               { href: '/#projects', label: t.nav.projects },
+              { href: '/how-we-work', label: lang === 'ar' ? 'كيف نعمل' : 'How We Work' },
               { href: '/about', label: lang === 'ar' ? 'عن الشركة' : 'About' },
               { href: '/contact', label: lang === 'ar' ? 'التواصل والدعم' : 'Contact & Support' },
             ].map((l) => (
