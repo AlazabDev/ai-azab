@@ -25,8 +25,8 @@ export function Navbar() {
   const links = [
     { href: '/#services', label: t.nav.services },
     { href: '/#ai', label: t.nav.ai },
+    { href: '/how-we-work', label: isRTL ? 'كيف نعمل' : 'How We Work' },
     { href: '/#projects', label: t.nav.projects },
-    { href: '/#process', label: t.nav.process },
     { href: '/#contact', label: t.nav.contact },
   ]
 
