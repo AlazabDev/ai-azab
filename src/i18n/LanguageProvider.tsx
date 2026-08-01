@@ -6,7 +6,7 @@ type Ctx = { lang: Lang; setLang: (l: Lang) => void; toggle: () => void; t: Cont
 const LanguageContext = createContext<Ctx | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("ar");
+  const [lang, setLang] = useState<Lang>("en");
 
   useEffect(() => {
     const html = document.documentElement;

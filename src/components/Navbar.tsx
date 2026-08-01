@@ -23,11 +23,11 @@ export function Navbar() {
   }, [open])
 
   const links = [
-    { href: '#services', label: t.nav.services },
-    { href: '#ai', label: t.nav.ai },
-    { href: '#projects', label: t.nav.projects },
-    { href: '#process', label: t.nav.process },
-    { href: '#contact', label: t.nav.contact },
+    { href: '/#services', label: t.nav.services },
+    { href: '/#ai', label: t.nav.ai },
+    { href: '/#projects', label: t.nav.projects },
+    { href: '/#process', label: t.nav.process },
+    { href: '/#contact', label: t.nav.contact },
   ]
 
   return (
@@ -38,7 +38,7 @@ export function Navbar() {
         }`}
       >
         <nav className="mx-auto max-w-7xl px-5 sm:px-8 py-3.5 flex items-center justify-between gap-4">
-          <a href="#hero" className="flex items-center shrink-0" aria-label="ai-azab.co">
+          <a href="/" className="flex items-center shrink-0" aria-label="ai-azab.co">
             <img src="/logo-mark.png" alt="شركة العزب للخدمات الهندسية — ai-azab.co" className="h-8 w-auto" width={732} height={186} />
           </a>
 
@@ -64,7 +64,7 @@ export function Navbar() {
               {t.nav.langLabel}
             </button>
             <a
-              href="#contact"
+              href="/#contact"
               className="hidden sm:inline-flex rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-brand-foreground hover:bg-brand-soft transition-colors"
             >
               {t.nav.cta}
@@ -99,7 +99,7 @@ export function Navbar() {
               </a>
             ))}
             <a
-              href="#contact"
+              href="/#contact"
               onClick={() => setOpen(false)}
               className="mt-6 rounded-full bg-brand px-6 py-4 text-center font-bold text-brand-foreground"
             >
