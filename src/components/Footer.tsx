@@ -47,6 +47,19 @@ export function Footer() {
             ))}
           </ul>
         </div>
+
+        <div>
+          <h4 className="text-sm font-bold text-foreground">{lang === 'ar' ? 'قانوني' : 'Legal'}</h4>
+          <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
+            {docs.map((d) => (
+              <li key={d.slug}>
+                <Link to={`/legal/${d.slug}`} className="hover:text-brand transition-colors">
+                  {d.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="border-t border-border">
