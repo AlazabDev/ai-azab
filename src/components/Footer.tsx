@@ -1,6 +1,6 @@
 'use client'
 
-import logoMark from '@/assets/logo-mark.png.asset.json'
+
 import { useLang } from '@/i18n/LanguageProvider'
 
 export function Footer() {
@@ -12,7 +12,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5">
-            <img src={logoMark.url} alt="Al Azab" className="h-7 w-auto" width={64} height={32} />
+            <img src="/logo-mark.png" alt="Al Azab" className="h-7 w-auto" width={64} height={32} />
             <span className="text-lg font-extrabold tracking-tight text-foreground">
               ai-azab<span className="text-brand">.co</span>
             </span>
