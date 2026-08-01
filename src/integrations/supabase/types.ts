@@ -600,6 +600,39 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          lang: string
+          message: string | null
+          name: string
+          phone: string | null
+          project_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          lang?: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          project_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          lang?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          project_type?: string | null
+        }
+        Relationships: []
+      }
       model_pricing: {
         Row: {
           created_at: string
