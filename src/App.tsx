@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageProvider'
+import { ChatWidget } from './components/chat/ChatWidget'
 import Home from './pages/Home'
 import LegalPage from './pages/LegalPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import HowWeWorkPage from './pages/HowWeWorkPage'
+import ChatPage from './pages/ChatPage'
 import NotFound from './pages/NotFound'
+
 
 const LEGAL_SLUGS = [
   'privacy-policy',
@@ -28,13 +31,17 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/how-we-work" element={<HowWeWorkPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:threadId" element={<ChatPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
           {LEGAL_SLUGS.map((slug) => (
             <Route key={slug} path={`/${slug}`} element={<LegalPage />} />
           ))}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ChatWidget />
       </BrowserRouter>
+
     </LanguageProvider>
   )
 }
