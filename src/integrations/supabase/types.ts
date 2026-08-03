@@ -389,6 +389,68 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          thread_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          foundry_thread_id: string | null
+          id: string
+          lang: string
+          session_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          foundry_thread_id?: string | null
+          id?: string
+          lang?: string
+          session_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          foundry_thread_id?: string | null
+          id?: string
+          lang?: string
+          session_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
