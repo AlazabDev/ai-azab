@@ -92,7 +92,14 @@ async function foundry(path: string, init: RequestInit = {}) {
     if (res.status !== 401 && res.status !== 403) break;
     cachedToken = null;
   }
+  if (last.status === 401 || last.status === 403) {
+    throw new Error(
+      "The Microsoft Foundry agent rejected the request: the service principal is not authorised on the Foundry project. " +
+        "Grant it the 'Azure AI User' role on the project, then try again.",
+    );
+  }
   throw new Error(`Foundry request failed [${last.status}]: ${last.text.slice(0, 600)}`);
+
 
 }
 
