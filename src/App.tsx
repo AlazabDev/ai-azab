@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageProvider'
+import { ChatWidget } from './components/chat/ChatWidget'
 import Home from './pages/Home'
 import LegalPage from './pages/LegalPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import HowWeWorkPage from './pages/HowWeWorkPage'
+import ChatPage from './pages/ChatPage'
 import NotFound from './pages/NotFound'
+
 
 const LEGAL_SLUGS = [
   'privacy-policy',
