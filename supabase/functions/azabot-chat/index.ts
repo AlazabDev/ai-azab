@@ -72,25 +72,28 @@ async function foundryOnce(path: string, init: RequestInit, auth: Record<string,
 
 async function foundry(path: string, init: RequestInit = {}) {
   const { apiKey } = foundryConfig();
-  const attempts: Array<Record<string, string>> = [];
+  const attempts: Array<{ label: string; headers: Record<string, string> }> = [];
 
   for (const scope of SCOPES) {
     const token = await aadToken(scope);
-    if (token) attempts.push({ Authorization: `Bearer ${token}` });
+    if (token) attempts.push({ label: scope, headers: { Authorization: `Bearer ${token}` } });
   }
-  if (apiKey) attempts.push({ "api-key": apiKey, Authorization: `Bearer ${apiKey}` });
+  if (apiKey) {
+    attempts.push({ label: "api-key", headers: { "api-key": apiKey, Authorization: `Bearer ${apiKey}` } });
+  }
   if (attempts.length === 0) throw new Error("No Microsoft Foundry credentials available.");
 
   let last = { status: 0, text: "" };
-  for (const auth of attempts) {
-    const { res, text } = await foundryOnce(path, init, auth);
+  for (const attempt of attempts) {
+    const { res, text } = await foundryOnce(path, init, attempt.headers);
     if (res.ok) return text ? JSON.parse(text) : {};
+    console.error(`Foundry ${path} via ${attempt.label} -> ${res.status}: ${text.slice(0, 300)}`);
     last = { status: res.status, text };
     if (res.status !== 401 && res.status !== 403) break;
     cachedToken = null;
   }
-  console.error(`Foundry ${path} failed [${last.status}]: ${last.text}`);
   throw new Error(`Foundry request failed [${last.status}]: ${last.text.slice(0, 600)}`);
+
 }
 
 
