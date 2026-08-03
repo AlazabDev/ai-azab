@@ -31,13 +31,17 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/how-we-work" element={<HowWeWorkPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:threadId" element={<ChatPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
           {LEGAL_SLUGS.map((slug) => (
             <Route key={slug} path={`/${slug}`} element={<LegalPage />} />
           ))}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ChatWidget />
       </BrowserRouter>
+
     </LanguageProvider>
   )
 }
