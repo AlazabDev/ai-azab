@@ -82,6 +82,23 @@ export function Hero() {
               {t.hero.ctaSecondary}
             </a>
           </div>
+
+          <motion.a
+            href="#services"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.1, duration: 0.6 }}
+            className="mt-12 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:text-brand transition-colors"
+          >
+            <span className="relative flex h-7 w-4 items-start justify-center rounded-full border border-current pt-1">
+              <motion.span
+                className="h-1.5 w-0.5 rounded-full bg-current"
+                animate={{ y: [0, 7, 0], opacity: [1, 0.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </span>
+            {t.hero.scroll}
+          </motion.a>
         </motion.div>
       </div>
     </div>
