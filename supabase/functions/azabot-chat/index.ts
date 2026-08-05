@@ -229,9 +229,10 @@ Deno.serve(async (req) => {
         method: "POST",
         body: JSON.stringify({
           conversation: conversationId,
-          agent: { name: agentName, version: agentVersion, type: "agent_reference" },
+          agent_reference: { name: agentName, version: agentVersion, type: "agent_reference" },
         }),
       });
+
 
       const reply = extractOutputText(response) ||
         (thread.lang === "ar" ? "لم أستطع توليد رد." : "I could not generate a reply.");
