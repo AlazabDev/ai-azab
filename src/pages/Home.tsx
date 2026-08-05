@@ -7,10 +7,13 @@ import { Projects } from '@/components/Projects'
 import { Process } from '@/components/Process'
 import { Contact } from '@/components/Contact'
 import { Footer } from '@/components/Footer'
+import { ScrollProgress } from '@/components/ScrollProgress'
+import { BackToTop } from '@/components/BackToTop'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <ScrollProgress />
       <Navbar />
       <main className="relative" role="main">
         <section id="hero" aria-label="Hero">
@@ -24,6 +27,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   )
 }
