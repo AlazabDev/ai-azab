@@ -30,7 +30,7 @@ export function Services() {
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.08 }}
                 whileHover={{ y: -4 }}
-                className="group rounded-2xl border border-border bg-card p-7 transition-colors duration-300 hover:border-brand/60 hover:shadow-[0_18px_40px_-24px_hsl(var(--brand)/0.55)]"
+                className="group rounded-2xl border border-border bg-card p-7 transition-colors duration-300 hover:border-brand/60 hover:shadow-xl"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-brand-foreground">
                   <Icon className="h-6 w-6" />
