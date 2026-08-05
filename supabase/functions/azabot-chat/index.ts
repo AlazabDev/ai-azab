@@ -12,28 +12,29 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
-const API_VERSION = "2025-05-01";
+const env = (name: string) => (Deno.env.get(name) ?? "").trim();
 
 function foundryConfig() {
-  const endpoint = (Deno.env.get("AZURE_FOUNDRY_ENDPOINT") ?? "").trim().replace(/\/+$/, "");
-  const apiKey = (Deno.env.get("AZURE_FOUNDRY_API_KEY") ?? "").trim();
-  const agentId = (Deno.env.get("AZURE_FOUNDRY_AGENT_ID") ?? "").trim();
-  if (!endpoint || !agentId) {
-    throw new Error("Microsoft Foundry agent is not configured (endpoint / agent id missing).");
+  const projectEndpoint = (env("AZURE_FOUNDRY_PROJECT_ENDPOINT") || env("AZURE_FOUNDRY_ENDPOINT")).replace(/\/+$/, "");
+  const agentName = env("AZURE_FOUNDRY_AGENT_NAME") || env("AZURE_FOUNDRY_AGENT_ID");
+  const agentVersion = env("AZURE_FOUNDRY_AGENT_VERSION") || "1";
+  const apiKey = env("AZURE_FOUNDRY_API_KEY");
+  if (!projectEndpoint || !agentName) {
+    throw new Error("Microsoft Foundry agent is not configured (project endpoint / agent name missing).");
   }
-  return { endpoint, apiKey, agentId };
+  // Candidate OpenAI v1 base URLs: project-scoped first, then resource-scoped.
+  const resourceRoot = projectEndpoint.replace(/\/api\/projects\/[^/]+$/, "");
+  const bases = [`${projectEndpoint}/openai/v1`, `${resourceRoot}/openai/v1`];
+  return { projectEndpoint, agentName, agentVersion, apiKey, bases };
 }
 
-const SCOPES = ["https://ai.azure.com/.default", "https://ml.azure.com/.default"];
-let cachedToken: { value: string; scope: string; expires: number } | null = null;
+let cachedToken: { value: string; expires: number } | null = null;
 
-async function aadToken(scope: string): Promise<string | null> {
-  if (cachedToken && cachedToken.scope === scope && cachedToken.expires > Date.now() + 60_000) {
-    return cachedToken.value;
-  }
-  const tenant = (Deno.env.get("AZURE_TENANT_ID") ?? "").trim();
-  const clientId = (Deno.env.get("AZURE_CLIENT_ID") ?? "").trim();
-  const clientSecret = (Deno.env.get("AZURE_CLIENT_SECRET") ?? "").trim();
+async function aadToken(): Promise<string | null> {
+  if (cachedToken && cachedToken.expires > Date.now() + 60_000) return cachedToken.value;
+  const tenant = env("AZURE_TENANT_ID");
+  const clientId = env("AZURE_CLIENT_ID");
+  const clientSecret = env("AZURE_CLIENT_SECRET");
   if (!tenant || !clientId || !clientSecret) return null;
 
   const res = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
@@ -43,7 +44,7 @@ async function aadToken(scope: string): Promise<string | null> {
       grant_type: "client_credentials",
       client_id: clientId,
       client_secret: clientSecret,
-      scope,
+      scope: "https://ai.azure.com/.default",
     }),
   });
   const text = await res.text();
@@ -52,46 +53,48 @@ async function aadToken(scope: string): Promise<string | null> {
     return null;
   }
   const data = JSON.parse(text);
-  cachedToken = {
-    value: data.access_token,
-    scope,
-    expires: Date.now() + (Number(data.expires_in ?? 3600) * 1000),
-  };
+  cachedToken = { value: data.access_token, expires: Date.now() + Number(data.expires_in ?? 3600) * 1000 };
   return cachedToken.value;
 }
 
-async function foundryOnce(path: string, init: RequestInit, auth: Record<string, string>) {
-  const { endpoint } = foundryConfig();
-  const sep = path.includes("?") ? "&" : "?";
-  const res = await fetch(`${endpoint}${path}${sep}api-version=${API_VERSION}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...auth, ...(init.headers ?? {}) },
-  });
-  return { res, text: await res.text() };
-}
+let workingBase: string | null = null;
 
 async function foundry(path: string, init: RequestInit = {}) {
-  const { apiKey } = foundryConfig();
-  const attempts: Array<{ label: string; headers: Record<string, string> }> = [];
+  const { apiKey, bases } = foundryConfig();
 
-  for (const scope of SCOPES) {
-    const token = await aadToken(scope);
-    if (token) attempts.push({ label: scope, headers: { Authorization: `Bearer ${token}` } });
-  }
+  const authVariants: Array<{ label: string; headers: Record<string, string> }> = [];
+  const token = await aadToken();
+  if (token) authVariants.push({ label: "aad", headers: { Authorization: `Bearer ${token}` } });
   if (apiKey) {
-    attempts.push({ label: "api-key", headers: { "api-key": apiKey, Authorization: `Bearer ${apiKey}` } });
+    authVariants.push({ label: "api-key", headers: { "api-key": apiKey, Authorization: `Bearer ${apiKey}` } });
   }
-  if (attempts.length === 0) throw new Error("No Microsoft Foundry credentials available.");
+  if (authVariants.length === 0) throw new Error("No Microsoft Foundry credentials available.");
 
+  const baseList = workingBase ? [workingBase, ...bases.filter((b) => b !== workingBase)] : bases;
   let last = { status: 0, text: "" };
-  for (const attempt of attempts) {
-    const { res, text } = await foundryOnce(path, init, attempt.headers);
-    if (res.ok) return text ? JSON.parse(text) : {};
-    console.error(`Foundry ${path} via ${attempt.label} -> ${res.status}: ${text.slice(0, 300)}`);
-    last = { status: res.status, text };
-    if (res.status !== 401 && res.status !== 403) break;
-    cachedToken = null;
+
+  for (const base of baseList) {
+    for (const auth of authVariants) {
+      const res = await fetch(`${base}${path}`, {
+        ...init,
+        headers: { "Content-Type": "application/json", ...auth.headers, ...(init.headers ?? {}) },
+      });
+      const text = await res.text();
+      if (res.ok) {
+        workingBase = base;
+        return text ? JSON.parse(text) : {};
+      }
+      console.error(`Foundry ${base}${path} via ${auth.label} -> ${res.status}: ${text.slice(0, 300)}`);
+      last = { status: res.status, text };
+      // 404 => wrong base URL, try next base; 401/403 => try next auth variant
+      if (res.status === 404) break;
+      if (res.status !== 401 && res.status !== 403) {
+        throw new Error(`Foundry request failed [${res.status}]: ${text.slice(0, 600)}`);
+      }
+      cachedToken = null;
+    }
   }
+
   if (last.status === 401 || last.status === 403) {
     throw new Error(
       "The Microsoft Foundry agent rejected the request: the service principal is not authorised on the Foundry project. " +
@@ -99,15 +102,16 @@ async function foundry(path: string, init: RequestInit = {}) {
     );
   }
   throw new Error(`Foundry request failed [${last.status}]: ${last.text.slice(0, 600)}`);
-
-
 }
 
-
-function extractText(message: Record<string, unknown>): string {
-  const parts = (message?.content ?? []) as Array<Record<string, any>>;
-  return parts
-    .map((p) => (p?.type === "text" ? (p.text?.value ?? p.text ?? "") : ""))
+function extractOutputText(response: Record<string, any>): string {
+  if (typeof response?.output_text === "string" && response.output_text.trim()) {
+    return response.output_text.trim();
+  }
+  const output = (response?.output ?? []) as Array<Record<string, any>>;
+  return output
+    .flatMap((item) => (Array.isArray(item?.content) ? item.content : []))
+    .map((c: Record<string, any>) => (typeof c?.text === "string" ? c.text : c?.text?.value ?? ""))
     .filter(Boolean)
     .join("\n")
     .trim();
@@ -200,38 +204,36 @@ Deno.serve(async (req) => {
         .single();
       if (insErr) throw insErr;
 
-      const { agentId } = foundryConfig();
+      const { agentName, agentVersion } = foundryConfig();
 
-      let foundryThreadId = thread.foundry_thread_id as string | null;
-      if (!foundryThreadId) {
-        const created = await foundry("/threads", { method: "POST", body: JSON.stringify({}) });
-        foundryThreadId = created.id;
+      // Conversation (Foundry v1) keeps the agent's memory across turns.
+      let conversationId = thread.foundry_thread_id as string | null;
+      if (!conversationId) {
+        const conversation = await foundry("/conversations", {
+          method: "POST",
+          body: JSON.stringify({
+            items: [{ type: "message", role: "user", content: text }],
+          }),
+        });
+        conversationId = conversation.id;
+      } else {
+        await foundry(`/conversations/${conversationId}/items`, {
+          method: "POST",
+          body: JSON.stringify({
+            items: [{ type: "message", role: "user", content: text }],
+          }),
+        });
       }
 
-      await foundry(`/threads/${foundryThreadId}/messages`, {
+      const response = await foundry("/responses", {
         method: "POST",
-        body: JSON.stringify({ role: "user", content: text }),
+        body: JSON.stringify({
+          conversation: conversationId,
+          agent: { name: agentName, version: agentVersion, type: "agent_reference" },
+        }),
       });
 
-      let run = await foundry(`/threads/${foundryThreadId}/runs`, {
-        method: "POST",
-        body: JSON.stringify({ assistant_id: agentId }),
-      });
-
-      const deadline = Date.now() + 90_000;
-      while (["queued", "in_progress", "requires_action"].includes(run.status) && Date.now() < deadline) {
-        await new Promise((r) => setTimeout(r, 900));
-        run = await foundry(`/threads/${foundryThreadId}/runs/${run.id}`, { method: "GET" });
-      }
-
-      if (run.status !== "completed") {
-        const detail = run?.last_error?.message ?? run?.status ?? "unknown";
-        throw new Error(`Agent run did not complete: ${detail}`);
-      }
-
-      const list = await foundry(`/threads/${foundryThreadId}/messages?order=desc&limit=10`, { method: "GET" });
-      const items = (list.data ?? []) as Array<Record<string, any>>;
-      const reply = extractText(items.find((m) => m.role === "assistant") ?? {}) ||
+      const reply = extractOutputText(response) ||
         (thread.lang === "ar" ? "لم أستطع توليد رد." : "I could not generate a reply.");
 
       const { data: botMsg, error: botErr } = await supabase
@@ -245,7 +247,7 @@ Deno.serve(async (req) => {
       await supabase
         .from("chat_threads")
         .update({
-          foundry_thread_id: foundryThreadId,
+          foundry_thread_id: conversationId,
           updated_at: new Date().toISOString(),
           ...(isNewTitle ? { title: text.slice(0, 60) } : {}),
         })
